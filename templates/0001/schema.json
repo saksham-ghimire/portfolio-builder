@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Portfolio Config",
+  "type": "object",
+  "properties": {
+    "base": {
+      "type": "object",
+      "properties": {
+        "profile_image": { "type": "string" },
+        "nav_items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "link": { "type": "string" },
+              "data_target_id": { "type": "string" }
+            },
+            "required": ["title", "link"]
+          }
+        }
+      },
+      "required": ["nav_items"]
+    },
+    "pages": {
+      "type": "object",
+      "properties": {
+        "main": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "home": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "designations": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "bio": { "type": "string" },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "icon": { "type": "string" },
+                      "link": { "type": "string" }
+                    },
+                    "required": ["icon", "link"]
+                  }
+                }
+              },
+              "required": ["name", "bio"]
+            }
+          },
+          "required": ["title", "home"]
+        }
+      }
+    },
+    "collections": {
+      "type": "object",
+      "properties": {
+        "project_details": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "category": { "type": "string" },
+                  "source_link": { "type": "string" },
+                  "overview": { "type": "string" },
+                  "tech_stacks": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "technical_insights": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "relevant_articles": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "title": { "type": "string" },
+                        "link": { "type": "string" }
+                      },
+                      "required": ["title", "link"]
+                    }
+                  },
+                  "output_file": { "type": "string" }
+                },
+                "required": ["title", "category", "output_file"]
+              }
+            }
+          },
+          "required": ["items"]
+        }
+      }
+    }
+  },
+  "required": ["Base", "Pages"]
+}

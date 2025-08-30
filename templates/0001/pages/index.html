@@ -1,0 +1,383 @@
+{{ define "content" }}
+<div class="flex flex-col p-4 gap-20">
+  <!-- Landing section -->
+  {{ if .home }}
+  <section id="home" class="h-[90vh] flex items-center">
+    <div class="flex flex-col gap-8 w-full">
+      <div class="flex flex-col gap-3">
+        <h1 class="text-5xl font-bold font-serif uppercase">
+          {{ .home.name }}
+        </h1>
+        {{ if .home.designations }}
+        <p class="text-lg font-mono">
+          {{ range $i, $designation := .home.designations }} {{- if $i }} | {{
+          end }}{{ $designation }} {{- end }}
+        </p>
+        {{ end }}
+      </div>
+
+      <p class="w-[70%] max-w-screen-md text-justify">{{ .home.bio }}</p>
+
+      {{ if .home.contacts }}
+      <div class="flex gap-4">
+        {{ range .home.contacts }}
+        <a
+          href="{{ .link }}"
+          target="_blank"
+          class="flex items-center justify-center w-12 h-12 rounded-full bg-gray-500 text-white shadow-md hover:bg-white hover:text-gray-500 transition text-2xl"
+        >
+          <i class="{{ .icon }}"></i>
+        </a>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+  </section>
+  {{ end }}
+
+  <!-- About section -->
+  <section id="about" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4">
+      <h1 class="text-3xl font-bold text-primary font-mono">
+        <span class="underline underline-offset-8">Abo</span>ut
+      </h1>
+
+      <p class="text-justify">{{ .about.overview }}</p>
+    </div>
+
+    {{ if .about.designations }} {{ range .about.designations }}
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-xl font-bold text-primary font-mono">{{ .title }}</h1>
+        {{ if .quote }}
+        <p class="italic text-sm">{{ .quote }}</p>
+        {{ end }}
+      </div>
+      {{ if .statement }}
+      <p class="text-justify">{{ .statement }}</p>
+      {{ end }}
+    </div>
+    {{ end }} {{ end }}
+  </section>
+
+  <!-- Resume section - only show if education or experience exists -->
+  {{ if or .resume .resume.education .resume.experience }}
+  <section id="resume" class="flex flex-col gap-6">
+    <h1 class="text-3xl font-bold text-primary font-mono">
+      <span class="underline underline-offset-8">Res</span>ume {{ if
+      .resume.pdf_link }}
+      <a
+        href="{{ .resume.pdf_link }}"
+        target="_blank"
+        class="text-lg hover:text-primary/70 transition-colors"
+        aria-label="Download PDF Resume"
+      >
+        <i class="fas fa-file-pdf"></i>
+        <span class="sr-only">Download PDF Resume</span>
+      </a>
+      {{ end }}
+    </h1>
+
+    <div class="flex flex-wrap gap-10">
+      <!-- Education -->
+      {{ if .resume.education }}
+      <div class="flex min-w-[300px] flex-1 flex-col gap-6">
+        <h1 class="text-xl font-bold text-primary font-mono">Education</h1>
+        <div class="border-s-2 border-solid border-primary space-y-8">
+          {{ range .resume.education }}
+          <div class="relative ps-6">
+            <div
+              class="absolute -left-[0.65rem] top-1.5 w-5 h-5 rounded-full border-4 border-background bg-primary"
+            ></div>
+            <h3 class="font-semibold text-lg uppercase">{{ .title }}</h3>
+            {{ if .duration }}
+            <div
+              class="bg-gray-200 text-gray-700 inline-block px-3 py-1 rounded text-sm my-2"
+            >
+              {{ .duration }}
+            </div>
+            {{ end }} {{ if .organization }}
+            <p class="text-gray-600 italic">{{ .organization }}</p>
+            {{ end }} {{ if .description }}
+            <p class="mt-2">{{ .description }}</p>
+            {{ end }}
+          </div>
+          {{ end }}
+        </div>
+      </div>
+      {{ end }}
+
+      <!-- Experience -->
+      {{ if .resume.experience }}
+      <div class="flex min-w-[300px] flex-1 flex-col gap-6">
+        <h1 class="text-xl font-bold text-primary font-mono">Experience</h1>
+        <div class="border-s-2 border-solid border-primary space-y-8">
+          {{ range .resume.experience }}
+          <div class="relative ps-6">
+            <div
+              class="absolute -left-[0.65rem] top-1.5 w-5 h-5 rounded-full border-4 border-background bg-primary"
+            ></div>
+            <h3 class="font-semibold text-lg uppercase">{{ .title }}</h3>
+            {{ if .duration }}
+            <div
+              class="bg-gray-200 text-gray-700 inline-block px-3 py-1 rounded text-sm my-2"
+            >
+              {{ .duration }}
+            </div>
+            {{ end }} {{ if .organization }}
+            <p class="text-gray-600 italic">{{ .organization }}</p>
+            {{ end }} {{ if .responsibilities }}
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+              {{ range .responsibilities }}
+              <li>{{ . }}</li>
+              {{ end }}
+            </ul>
+            {{ end }}
+          </div>
+          {{ end }}
+        </div>
+      </div>
+      {{ end }}
+    </div>
+  </section>
+  {{ end }}
+
+  <!-- Skills section -->
+  {{ if .skills }}
+  <section id="skills" class="flex flex-col gap-6">
+    <h1 class="text-3xl font-bold text-primary font-mono">
+      <span class="underline underline-offset-8">Ski</span>lls
+    </h1>
+
+    <div
+      class="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 items-start w-[95%] max-w-screen-xl mx-auto"
+    >
+      {{ range $index, $skill := .skills }}
+      <div
+        class="bg-white rounded-lg shadow border border-gray-200 flex flex-col"
+      >
+        <button
+          type="button"
+          class="w-full flex items-center justify-between px-4 py-3 h-12 focus:outline-none accordion-toggle"
+          data-target="skill-{{ $index }}"
+        >
+          <span
+            class="flex items-center gap-2 text-primary font-mono font-semibold text-lg"
+          >
+            {{ if $skill.icon }}
+            <span class="text-xl"><i class="{{ $skill.icon }}"></i></span>
+            {{ end }}
+            <span class="uppercase">{{ $skill.title }}</span>
+          </span>
+          <span class="accordion-arrow transition-transform duration-200"
+            ><i class="fas fa-chevron-down"></i
+          ></span>
+        </button>
+        {{ if $skill.description }}
+        <div
+          id="skill-{{ $index }}"
+          class="accordion-content px-4 pb-3 hidden text-sm h-auto sm:overflow-y-auto text-gray-700"
+        >
+          {{ $skill.description }}
+        </div>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+  </section>
+  {{ end }}
+
+  <!-- Projects section -->
+  {{ if .projects }}
+  <section id="projects" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4">
+      <h1 class="text-3xl font-bold text-primary font-mono">
+        <span class="underline underline-offset-8">Pro</span>jects
+      </h1>
+    </div>
+    <div class="flex flex-col w-[85%] max-w-screen-xl mx-auto gap-6">
+      <!-- Project category tabs -->
+      <div class="border-b border-gray-200">
+        <ul
+          class="flex flex-wrap overflow-x-auto -mb-px text-sm font-medium text-center scrollbar-hide project-tabs"
+          style="white-space: nowrap"
+        >
+          <li class="mr-2">
+            <a
+              href="#"
+              class="inline-block p-4 border-b-2 text-primary border-primary hover:text-primary hover:border-primary font-mono project-tab"
+              data-target-category="all"
+              >All</a
+            >
+          </li>
+          {{ range .projects.categories }}
+          <li class="mr-2">
+            <a
+              href="#"
+              class="inline-block p-4 border-b-2 capitalize hover:text-primary hover:border-primary font-mono project-tab"
+              data-target-category="{{ . }}"
+              >{{ . }}</a
+            >
+          </li>
+          {{ end }}
+        </ul>
+      </div>
+
+      <!-- Project cards -->
+      <div
+        class="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 project-list"
+      >
+        {{ range .projects.items }}
+        <div
+          class="max-w-sm w-full border border-gray-300 rounded-lg shadow-lg project-card flex flex-col"
+          data-category="{{ .category }}"
+        >
+          <img
+            class="rounded-t-lg w-full h-36 object-contain"
+            src="{{ .image }}"
+            alt="{{ .title }} thumbnail"
+          />
+
+          <div class="flex flex-col gap-2 p-5 flex-1">
+            <a
+              class="mb-2 text-xl font-bold tracking-tight text-primary"
+              href="{{ .source_link }}"
+            >
+              {{ .title }}
+            </a>
+            <p class="mb-3 font-normal text-primary-700 text-sm">
+              {{ .description }}
+            </p>
+            <a
+              href="{{ .source_link }}"
+              class="inline-flex items-center px-2 py-1.5 text-base text-center text-white bg-primary rounded-lg hover:bg-primary/90 focus:ring-4 focus:outline-none focus:ring-primary/50 transition self-start mt-auto"
+            >
+              View Project
+              <svg
+                class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 14 10"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M1 5h12m0 0L9 1m4 4L9 9"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+  {{ end }}
+
+  <!-- Articles section -->
+  {{ if .articles }}
+  <section id="articles" class="flex flex-col gap-6">
+    <div class="flex flex-col gap-4">
+      <h1 class="text-3xl font-bold text-primary font-mono">
+        <span class="underline underline-offset-8">Art</span>icles
+      </h1>
+      {{ if .articles.description }}
+      <p class="text-gray-600">{{ .articles.description }}</p>
+      {{ end }}
+    </div>
+
+    <!-- Articles Preview Cards -->
+    <div class="flex flex-col gap-6 w-4/5 mx-auto">
+      {{ range $index, $article := .articles.items }}
+      <div
+        class="border border-gray-300 rounded-lg shadow-md overflow-hidden bg-white"
+      >
+        <div class="p-5">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-xl font-bold text-gray-800 hover:text-primary">
+              {{ $article.title }}
+            </h3>
+            {{ if $article.date }}
+            <span class="text-xs text-gray-500">{{ $article.date }}</span>
+            {{ end }}
+          </div>
+          {{ if $article.description }}
+          <p class="text-gray-600 mb-4">{{ $article.description }}</p>
+          {{ end }} {{ if $article.tags }}
+          <div class="flex flex-wrap gap-2 mb-4">
+            {{ range $article.tags }}
+            <span
+              class="bg-gray-100 text-primary-700 text-xs px-2 py-1 rounded-full"
+              >{{ . }}</span
+            >
+            {{ end }}
+          </div>
+          {{ end }}
+          <div class="flex justify-between items-center">
+            {{ if $article.published_on }}
+            <span class="text-sm text-gray-500"
+              >Published on {{ $article.published_on }}</span
+            >
+            {{ else }}
+            <span></span>
+            {{ end }} {{ if $article.link }}
+            <a
+              href="{{ $article.link }}"
+              target="_blank"
+              class="p-2 rounded-full bg-primary text-white hover:bg-primary/90 focus:ring-4 focus:outline-none focus:ring-primary/50 border border-gray-300 transition"
+              aria-label="Read More"
+            >
+              <svg
+                class="w-5 h-5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 14 10"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M1 5h12m0 0L9 1m4 4L9 9"
+                />
+              </svg>
+            </a>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+      {{ end }}
+    </div>
+
+    <!-- View All Articles Button -->
+    <div class="flex justify-center mt-4">
+      <a
+        href="articles.html"
+        class="inline-flex items-center px-3 py-2.5 text-base font-medium text-center text-white bg-primary rounded-lg hover:bg-primary/90 focus:ring-4 focus:outline-none focus:ring-primary/50 transition"
+      >
+        View All Articles
+        <svg
+          class="w-4 h-4 ms-2"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 14 10"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 5h12m0 0L9 1m4 4L9 9"
+          />
+        </svg>
+      </a>
+    </div>
+  </section>
+  {{ end }}
+</div>
+{{ end }}

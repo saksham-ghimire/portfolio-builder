@@ -1,0 +1,156 @@
+template_id: "0001"
+base:
+  theme:
+    primary: "#335c67" # Your custom primary color
+    secondary: "#e09f3e" # Your custom secondary color
+    background: "#f9f7f3" # Your custom background color
+  profile_image: "https://i.pinimg.com/736x/bf/95/34/bf953419d76bf747cba69b55e6e03957.jpg" # Path to your profile image
+  # depending on what section you have you can update nav_items
+  nav_items:
+    - title: "Home"
+      link: "/#home"
+      data_target_id: "#home"
+    - title: "About"
+      link: "/#about"
+      data_target_id: "#about"
+    - title: "Resume"
+      link: "/#resume"
+      data_target_id: "#resume"
+    - title: "Skills"
+      link: "/#skills"
+      data_target_id: "#skills"
+    - title: "Projects"
+      link: "/#projects"
+      data_target_id: "#projects"
+    - title: "Articles"
+      link: "/#articles"
+      data_target_id: "#articles"
+
+  copyright: # optional
+    text: "2024 Your Name. All rights reserved."
+    additional: "Built with Portfolio Builder" # Optional additional text
+
+pages:
+  index:
+    title: "Your Name Here" # Replace with your name
+
+    home:
+      name: "Your Name Here" # Replace with your name
+      designations: # optional, list your roles or titles
+        - "Software Engineer"
+        - "DevOps Engineer"
+      bio: "A brief description about yourself." # Replace with your bio
+      contacts: # optional, social links
+        - icon: "fab fa-linkedin-in"
+          link: "https://www.linkedin.com/in/your-profile/"
+        - icon: "fab fa-github"
+          link: "https://github.com/your-username"
+        - icon: "fas fa-envelope"
+          link: "mailto:you@example.com"
+
+    about:
+      overview: "Write a brief overview about your background, experience, and interests."
+      designations: # optional
+        - title: "Backend Developer/Engineer"
+          quote: "Optional motivational quote"
+          statement: "Brief description of your experience and skills in this role."
+        - title: "Software Engineer"
+          quote: "Optional motivational quote"
+          statement: "Brief description of your experience and skills in this role."
+
+    resume: # optional
+      pdf_link: "/path/to/your-resume.pdf" # optional
+      education: # optional
+        - title: "Degree Name"
+          duration: "YYYY - YYYY"
+          organization: "College/University Name"
+          description: "Short description about this degree"
+      experience: # optional
+        - title: "Job Title"
+          duration: "YYYY - YYYY"
+          organization: "Company Name"
+          responsibilities:
+            - "Responsibility 1"
+            - "Responsibility 2"
+
+    skills: # optional
+      - title: "Frontend"
+        icon: "fas fa-code"
+        description: "Brief description of your frontend skills."
+      - title: "Backend"
+        icon: "fas fa-code"
+        description: "Brief description of your backend skills."
+      - title: "Cloud"
+        icon: "fas fa-cloud"
+        description: "Brief description of your cloud experience."
+      - title: "Security"
+        icon: "fas fa-shield-alt"
+        description: "Brief description of your security knowledge."
+
+    projects: # optional
+      categories:
+        - "general"
+        - "opensource"
+        - "database"
+      items:
+        - title: "Project Title"
+          description: "Brief description of the project."
+          image: "https://i.pinimg.com/736x/bf/95/34/bf953419d76bf747cba69b55e6e03957.jpg" # Placeholder image
+          category: "general"
+          source_link: "/project_page.html"
+
+    articles: # optional
+      description: "Optional description about your articles or writing."
+      items:
+        - title: "Article Title"
+          description: "Brief description or summary of the article."
+          date: "Month DD, YYYY"
+          published_on: "Platform Name"
+          link: "#"
+          tags:
+            - "Tag1"
+            - "Tag2"
+  articles:
+    item_tags:
+      - "Security"
+      - "Cloud"
+      - "Architecture"
+    title: "All Articles"
+    items:
+      - title: "Zero-Trust Architecture in Modern Applications"
+        date: "2023-06-15"
+        published_on: "Medium"
+        link: "#"
+        tags: ["Security", "Cloud", "Cloud"]
+
+      - title: "Event-Driven Architecture: Beyond the Basics"
+        date: "2023-04-22"
+        published_on: "Dev.to"
+        link: "#"
+        tags: ["Architecture", "Microservices", "Backend"]
+
+      - title: "Building Resilient APIs with Go"
+        date: "2023-03-08"
+        published_on: "Personal Blog"
+        link: "#"
+        tags: ["Go", "API", "Backend"]
+
+collections:
+  project_details:
+    items:
+      - title: "Project Title"
+        category: "general"
+        source_link: "https://github.com/your-repo" # optional
+        overview: "Brief overview of the project."
+        tech_stacks: # optional
+          - "Language/Framework"
+          - "Tool/Library"
+        tags:
+          - "Tag1"
+          - "Tag2"
+        technical_insights: # optional
+          - "Insight or implementation detail"
+        relevant_articles: # optional
+          - title: "Article or reference title"
+            link: "https://example.com/link"
+        output_file: "project_page.html"

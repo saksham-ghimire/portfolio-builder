@@ -1,0 +1,119 @@
+{{ define "title" }}Project Details{{ end }} {{ define "content" }}
+<div class="flex flex-col p-4 gap-10 max-w-screen-xl mx-auto">
+  <section class="flex flex-col gap-6">
+    <div class="flex items-center gap-2 mb-2">
+      <a
+        href="/#projects"
+        class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-primary border border-gray-200 shadow hover:bg-primary hover:text-white transition focus:outline-none focus:ring-2 focus:ring-primary/30"
+        title="Back to Projects"
+      >
+        <i class="fas fa-arrow-left text-lg"></i>
+      </a>
+      <h1 class="text-3xl font-bold text-primary font-mono ml-2">
+        <span class="underline underline-offset-8">Pro</span>ject Details
+      </h1>
+    </div>
+
+    <!-- Project Header & Meta -->
+    <div
+      class="grid gap-4 grid-cols-1 sm:grid-cols-[minmax(220px,1fr)_auto] items-center bg-white rounded-lg shadow border border-gray-200 p-6"
+    >
+      <div class="min-w-[180px] flex flex-col gap-2">
+        <h2 class="text-2xl font-bold text-gray-800 mb-1">{{ .title }}</h2>
+        <div class="flex flex-wrap gap-2 items-center text-xs">
+          <span
+            class="inline-flex items-center px-2 py-1 rounded bg-secondary text-white font-semibold capitalize"
+            ><i class="fas fa-tag mr-1"></i> {{ .category }}</span
+          >
+        </div>
+      </div>
+      {{ if .source_link }}
+      <div class="flex flex-col gap-2 items-end min-w-[140px]">
+        <a
+          href="{{ .source_link }}"
+          target="_blank"
+          class="inline-flex items-center px-3 py-2 rounded bg-primary text-white text-sm font-mono transition hover:bg-primary/90"
+          rel="noopener"
+        >
+          <i class="fas fa-external-link-alt mr-2"></i> View Source
+        </a>
+      </div>
+      {{ end }}
+    </div>
+
+    <!-- Project Overview & Stacks -->
+    <div class="grid gap-6 grid-cols-1 lg:grid-cols-3">
+      <!-- Overview -->
+      <div
+        class="bg-white rounded-lg shadow border border-gray-200 p-6 flex flex-col gap-4 w-full order-2 lg:order-1 lg:col-span-2"
+      >
+        <h3 class="text-xl font-bold text-primary">Project Overview</h3>
+        <p class="text-gray-700 text-base">{{ .overview }}</p>
+
+        <!-- Technical Insights Section -->
+        {{ if .technical_insights }}
+        <div class="mt-6">
+          <h4 class="text-lg font-bold text-secondary mb-2">
+            Technical Insights
+          </h4>
+          <ul class="list-disc pl-6 text-gray-700 text-base">
+            {{ range .technical_insights }}
+            <li>{{ . }}</li>
+            {{ end }}
+          </ul>
+        </div>
+        {{ end }}
+      </div>
+
+      <!-- Tech Stack & Categories -->
+      <div
+        class="bg-white rounded-lg shadow self-start border border-gray-200 p-6 flex flex-col gap-4 w-full order-1 lg:order-2 lg:col-span-1"
+      >
+        {{ if .tech_stacks }}
+        <h3 class="text-lg font-bold text-primary mb-2">Tech Stack</h3>
+        <div class="flex flex-wrap gap-2">
+          {{ range .tech_stacks }}
+          <span
+            class="bg-gray-100 text-primary-700 text-xs px-3 py-1 rounded-full"
+            >{{ . }}</span
+          >
+          {{ end }}
+        </div>
+        {{ end }}
+
+        <h3 class="text-lg font-bold text-primary mt-4 mb-2">Tags</h3>
+        <div class="flex flex-wrap gap-2">
+          {{ range .tags }}
+          <span
+            class="bg-gray-100 text-primary-700 text-xs px-3 py-1 rounded-full"
+            >{{ . }}</span
+          >
+          {{ end }}
+        </div>
+      </div>
+    </div>
+
+    {{ if .relevant_articles }}
+    <!-- Relevant Articles -->
+    <div
+      class="bg-white rounded-lg shadow border border-gray-200 p-6 flex flex-col gap-4"
+    >
+      <h3 class="text-lg font-bold text-primary mb-2">Relevant Articles</h3>
+      <ul class="list-disc pl-6 text-gray-700 text-base">
+        {{ range .relevant_articles }}
+        <li>
+          <a
+            href="{{ .link }}"
+            target="_blank"
+            class="text-primary hover:underline"
+            rel="noopener"
+            >{{ .title }}</a
+          >
+        </li>
+        {{ end }}
+      </ul>
+    </div>
+    {{ end }}
+  </section>
+</div>
+{{ end }}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:ital,wght@0,100..900;1,100..900&family=PT+Serif+Caption:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/script.js" defer></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary:
+                "{{ if .theme.primary }}{{ .theme.primary }}{{ else }}#335c67{{ end }}", // Teal-like color
+              secondary:
+                "{{ if .theme.secondary }}{{ .theme.secondary }}{{ else }}#e09f3e{{ end }}", // Gold/amber color
+              background:
+                "{{ if .theme.background }}{{ .theme.background }}{{ else }}#f9f7f3{{ end }}", // Light cream background
+            },
+
+            fontFamily: {
+              mono: ['"Space Mono"'],
+              serif: ["PT Serif Caption"],
+              sans: ["Noto Sans Display"],
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <title>{{ block "title" . }}{{ end }}</title>
+  </head>
+  <body class="font-sans overflow-hidden">
+    <!-- Mobile menu button (only visible on mobile) -->
+    <div id="mobileMenuBtn" class="md:hidden fixed top-0 right-0 p-4 z-50">
+      <button
+        id="menuToggle"
+        class="bg-primary text-white p-2 rounded-md focus:outline-none"
+      >
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+
+    <div class="flex">
+      <nav
+        id="sidebar"
+        class="flex flex-col justify-center items-center w-64 h-screen bg-primary text-white p-4 sticky top-0 md:block hidden overflow-y-auto"
+      >
+        <div class="md:hidden absolute top-0 right-0 p-4">
+          <button id="closeMenu" class="text-white focus:outline-none">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <div class="flex flex-col h-full w-full">
+          <div class="flex flex-col flex-1 items-center justify-center space-y-8">
+            {{ if .base.profile_image }}
+            <img
+              src="{{ .base.profile_image }}"
+              alt="profile"
+              height="50%"
+              width="50%"
+              class="hidden md:block object-contain rounded-full mx-auto"
+            />
+            {{ end }}
+
+            <ul class="space-y-4 text-center w-full">
+              {{ range .base.nav_items }}
+              <li>
+                <a
+                  data-target="{{ .data_target_id }}"
+                  href="{{ .link }}"
+                  class="block py-2 px-4 font-semibold rounded transition text-white/60 hover:text-white focus:text-white focus:outline-none focus:ring-0"
+                  >{{ .title }}</a
+                >
+              </li>
+              {{ end }}
+            </ul>
+          </div>
+
+          <!-- Copyright section at bottom -->
+          {{ if .base.copyright }}
+          <!-- justify self end not working i want this to be on bottom most section -->
+          <div
+            class="border-t border-white/20 text-center text-xs text-white/60 m-auto"
+          >
+            <p>&copy; {{ .base.copyright.text }}</p>
+
+            {{ if .base.copyright.additional }}
+            <p class="mt-1">{{ .base.copyright.additional }}</p>
+            {{ end }}
+          </div>
+
+          {{ end }}
+        </div>
+      </nav>
+
+      <!-- Main content (scrollable) -->
+      <div
+        class="flex-1 h-screen overflow-y-auto bg-background md:scroll-smooth"
+      >
+        {{ template "content" . }}
+      </div>
+    </div>
+  </body>
+</html>
