@@ -33,14 +33,28 @@ type GitHubTree struct {
 }
 
 func main() {
-	// Parse command line arguments
+	// Custom usage message for --help
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [options]\n\n", os.Args[0])
+		fmt.Println("A portfolio generator that uses a template and a configuration file to build a static website.")
+		fmt.Println("Available commands:")
+		fmt.Println("  --template <template-id>  : Downloads the configuration for a specific template. Use this first!")
+		fmt.Println("  --config <file-path>      : (Optional) Specifies the path to your configuration file (default: config.yml).")
+		fmt.Println("  --output-dir <dir-path>   : (Optional) Sets the output directory for the generated site (default: .).")
+		fmt.Println("  --help                    : Shows this help message.")
+		fmt.Println("  --config                    : (Optional) Path to config file (default: .)")
+		fmt.Println("\nExample usage:")
+		fmt.Println("  To download a template configuration: ./portfolio-builder --template=0001")
+		fmt.Println("  To generate your portfolio: ./portfolio-builder")
+	}
+
 	templateId, configFilePath, outputDir := getArgs()
 	configUrl := fmt.Sprintf("https://raw.githubusercontent.com/saksham-ghimire/portfolio-builder/main/templates/%s/config.yml", templateId)
 
 	if templateId != "" {
 		log.Println("Fetching template configuration for id:", templateId)
 		downloadFile(configUrl, "config.yml")
-		log.Println("Successfully fetched the configuration, please update 'config.yml' as needed, and execute the program")
+		log.Println("Successfully fetched the configuration, please update 'config.yml' as needed, and then execute the program without --template to generate your portfolio.")
 		return
 	}
 
@@ -48,40 +62,33 @@ func main() {
 	schemaUrl := fmt.Sprintf("https://raw.githubusercontent.com/saksham-ghimire/portfolio-builder/main/templates/%s/schema.json", config.TemplateId)
 	validateConfig(schemaUrl, config)
 
-	// Download template from GitHub
 	templateDir := downloadTemplateFromGitHub(config.TemplateId)
 	defer os.RemoveAll(templateDir)
 
-	// Create output directory if it doesn't exist
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		log.Fatalf("Error creating output directory. Received error %v", err)
 	}
 
-	// Copy assets
 	if err := copyAssets(templateDir+"/pages", outputDir); err != nil {
 		log.Fatalf("Error copying assets. Received error %v", err)
 	}
 
-	// Generate pages based on config.pages
 	if err := generatePages(config, templateDir+"/pages", outputDir); err != nil {
 		log.Fatalf("Error generating pages. Received error %v", err)
 	}
 
-	// Generate collection pages
 	if err := generateCollections(config, templateDir+"/pages", outputDir); err != nil {
 		log.Fatalf("Error generating collections. Received error %v", err)
 	}
 
 	log.Println("Portfolio generation completed successfully!")
+	log.Printf("Your portfolio is ready in the '%s' directory.", outputDir)
 }
 
 func getArgs() (string, string, string) {
-
-	templateId := flag.String("template", "", "Configuration to use")
-
-	// both of these default should be fine
-	configFile := flag.String("config", "config.yml", "Configuration file path")
-	outputDir := flag.String("output-dir", ".", "Output directory path")
+	templateId := flag.String("template", "", "Downloads the configuration for a specific template.")
+	configFile := flag.String("config", "config.yml", "Specifies the path to the configuration file.")
+	outputDir := flag.String("output-dir", ".", "Sets the output directory for the generated site.")
 
 	flag.Parse()
 
@@ -89,10 +96,9 @@ func getArgs() (string, string, string) {
 }
 
 func readConfig(configFile string) Config {
-	// Load YAML data
 	yamlFile, err := os.ReadFile(configFile)
 	if err != nil {
-		log.Fatalf("Error reading config file: %v", err)
+		log.Fatalf("Error reading config file: %v. Make sure to run with --template first to download a config file.", err)
 	}
 
 	var config Config
@@ -104,17 +110,13 @@ func readConfig(configFile string) Config {
 }
 
 func validateConfig(uri string, config Config) {
-
 	schemaLoader := gojsonschema.NewReferenceLoader(uri)
-
 	jsonBytes, err := json.Marshal(config)
 	if err != nil {
 		log.Fatalf("Error converting config to JSON: %v", err)
 	}
-
 	documentLoader := gojsonschema.NewBytesLoader(jsonBytes)
 
-	// Validate
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	if err != nil {
 		log.Fatalf("Error validating schema: %v", err)
@@ -126,21 +128,16 @@ func validateConfig(uri string, config Config) {
 		for _, desc := range result.Errors() {
 			log.Printf("- %s\n", desc)
 		}
-		log.Fatalf("Config validation failed, please fix the resulted error and try again")
+		log.Fatalf("Config validation failed, please fix the errors")
 	}
-
 }
 
 func generatePages(config Config, templateDir, outputDir string) error {
-
 	for pageName := range config.Pages {
-
 		templatePath := filepath.Join(templateDir, pageName+".html")
-
 		var tmpl *template.Template
 		var err error
 
-		// Parse templates based on whether base template exists
 		if config.Base != nil {
 			var basePath = filepath.Join(templateDir, "base.html")
 			tmpl, err = template.ParseFiles(basePath, templatePath)
@@ -152,7 +149,6 @@ func generatePages(config Config, templateDir, outputDir string) error {
 			return fmt.Errorf("error parsing templates for page %s: %v", pageName, err)
 		}
 
-		// Create output file
 		outputFile := filepath.Join(outputDir, pageName+".html")
 		f, err := os.Create(outputFile)
 		if err != nil {
@@ -160,12 +156,8 @@ func generatePages(config Config, templateDir, outputDir string) error {
 		}
 		defer f.Close()
 
-		// Execute template
 		if config.Base != nil {
-			data := map[string]interface{}{
-				"base": config.Base,
-			}
-			// merge the page-specific context
+			data := map[string]interface{}{"base": config.Base}
 			if pageCtx, ok := config.Pages[pageName].(map[string]interface{}); ok {
 				for k, v := range pageCtx {
 					data[k] = v
@@ -173,7 +165,6 @@ func generatePages(config Config, templateDir, outputDir string) error {
 			}
 			err = tmpl.ExecuteTemplate(f, "base.html", data)
 		} else {
-			// why is it when base is nil the generate output file is always empty
 			err = tmpl.Execute(f, config.Pages[pageName])
 		}
 
@@ -193,15 +184,12 @@ func generateCollections(config Config, templateDir, outputDir string) error {
 	}
 
 	for collectionName, collectionData := range config.Collections {
-
 		itemsList, ok := collectionData.(map[string]interface{})["items"].([]interface{})
 		if !ok {
 			continue
 		}
 
-		// Use collection name as template name
 		templatePath := filepath.Join(templateDir, collectionName+".html")
-
 		var tmpl *template.Template
 		var err error
 
@@ -216,7 +204,6 @@ func generateCollections(config Config, templateDir, outputDir string) error {
 			return fmt.Errorf("error parsing templates for collection %s: %v", collectionName, err)
 		}
 
-		// Generate a page for each item in the collection
 		for _, item := range itemsList {
 			outputFile, ok := item.(map[string]interface{})["output_file"]
 			if !ok {
@@ -228,7 +215,6 @@ func generateCollections(config Config, templateDir, outputDir string) error {
 				continue
 			}
 
-			// Create output file
 			outputPath := filepath.Join(outputDir, outputFileName)
 			f, err := os.Create(outputPath)
 			if err != nil {
@@ -236,12 +222,8 @@ func generateCollections(config Config, templateDir, outputDir string) error {
 			}
 			defer f.Close()
 
-			// Execute template
 			if config.Base != nil {
-				data := map[string]interface{}{
-					"base": config.Base,
-				}
-				// merge the page-specific context
+				data := map[string]interface{}{"base": config.Base}
 				if pageCtx, ok := item.(map[string]interface{}); ok {
 					for k, v := range pageCtx {
 						data[k] = v
@@ -264,8 +246,6 @@ func generateCollections(config Config, templateDir, outputDir string) error {
 }
 
 func copyAssets(templateDir, outputDir string) error {
-
-	// Copy asset folders
 	assetFolders := []string{"assets"}
 	for _, folder := range assetFolders {
 		srcFolder := filepath.Join(templateDir, folder)
@@ -274,13 +254,11 @@ func copyAssets(templateDir, outputDir string) error {
 		}
 		dstFolder := filepath.Join(outputDir, folder)
 
-		// Copy folder recursively
 		err := filepath.WalkDir(srcFolder, func(path string, d os.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
 
-			// Get relative path from source folder
 			relPath, err := filepath.Rel(srcFolder, path)
 			if err != nil {
 				return err
@@ -292,7 +270,6 @@ func copyAssets(templateDir, outputDir string) error {
 				return os.MkdirAll(dstPath, 0755)
 			}
 
-			// Copy file
 			data, err := os.ReadFile(path)
 			if err != nil {
 				return err
@@ -309,7 +286,6 @@ func copyAssets(templateDir, outputDir string) error {
 }
 
 func downloadTemplateFromGitHub(templateId string) string {
-	// Create temporary directory
 	tempDir, err := os.MkdirTemp("", "portfolio-template-*")
 	if err != nil {
 		log.Fatalf("error creating temp directory: %v", err)
@@ -319,9 +295,7 @@ func downloadTemplateFromGitHub(templateId string) string {
 
 	log.Printf("Downloading template '%s'...", templateId)
 
-	// Get repository tree
 	treeURL := "https://api.github.com/repos/saksham-ghimire/portfolio-builder/git/trees/main?recursive=1"
-
 	resp, err := http.Get(treeURL)
 	if err != nil {
 		log.Fatalf("error fetching repository tree: %v", err)
@@ -337,10 +311,8 @@ func downloadTemplateFromGitHub(templateId string) string {
 		log.Fatalf("error parsing tree response: %v", err)
 	}
 
-	// Filter files for the specific template
 	templatePrefix := fmt.Sprintf("templates/%s/", templateId)
 	var templateFiles []string
-
 	for _, item := range tree.Tree {
 		if strings.HasPrefix(item.Path, templatePrefix) && item.Type == "blob" {
 			templateFiles = append(templateFiles, item.Path)
@@ -351,20 +323,15 @@ func downloadTemplateFromGitHub(templateId string) string {
 		log.Fatalf("no files found for template '%s'", templateId)
 	}
 
-	// Download each file
 	for _, filePath := range templateFiles {
 		relPath := strings.TrimPrefix(filePath, templatePrefix)
 		localPath := filepath.Join(templatePath, relPath)
-
-		// Create directory if needed
 		if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
 			log.Fatalf("error creating directory: %v", err)
 		}
 
-		// Download file
 		rawURL := fmt.Sprintf("https://raw.githubusercontent.com/saksham-ghimire/portfolio-builder/main/%s", filePath)
 		downloadFile(rawURL, localPath)
-
 		log.Printf("Downloaded: %s", relPath)
 	}
 
